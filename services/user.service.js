@@ -5,11 +5,14 @@ const Books = require('../db/models/book.model');
 const mongoose = require('mongoose');
 const { MESSAGE, ROLE } = require("../CONSTANT");
 
+//User signup function
 exports.signup = async (req) => {
     try{
         let isUserPresent = await Users.findOne({username: req.body.username}).countDocuments();
-        console.log(isUserPresent)
         if(!isUserPresent){
+            if(req.body.role != ROLE.MEMBER || req.body.role != ROLE.LIBRARIAN){
+                return {message: MESSAGE.not_a_valid_role};
+            }
             const user = new Users({
                 username: req.body.username,
                 role: req.body.role,
@@ -32,6 +35,7 @@ exports.signup = async (req) => {
     }
 };
 
+//user signIn function
 exports.signin = async (req) => {
     try{
         let user = await Users.findOne({username: req.body.username, $or: [{ deleted: false }, { deleted: null }]})
@@ -72,17 +76,18 @@ exports.signin = async (req) => {
     }
 };
 
+//Delete user function
 exports.deleteUser = async (data) => {
     try{
         const user = await Users.findOne({_id: new mongoose.Types.ObjectId(data.user_id)});
-        if(user.role == ROLE.LIBRARIAN){
+        if(user.role == ROLE.LIBRARIAN){                            //Checking if given user is not a librarian
             return {message: MESSAGE.cannot_delete_librarian}
         }
-        const borrowedBooks = await Books.find({user_id: new mongoose.Types.ObjectId(data.user_id)}).countDocuments();
-        if(borrowedBooks > 0){
+        const borrowedBooks = await Books.find({user_id: new mongoose.Types.ObjectId(data.user_id)}).countDocuments();  //Getting all borrowed book counts
+        if(borrowedBooks > 0){                                      //Cannot delete user who didn't return the book
             return {message: MESSAGE.user_has_borrowed_books};
         }
-        else{
+        else{                                                       //Delete user
             await Users.updateOne({_id: new mongoose.Types.ObjectId(data.user_id)}, {$set: {deleted: true}});
             return {message: MESSAGE.user_deleted_successfully};
         }
@@ -92,13 +97,14 @@ exports.deleteUser = async (data) => {
     }
 }
 
+//Get all user list
 exports.getAllUser = async (data) => {
     try{
         const user = await Users.findOne({_id: new mongoose.Types.ObjectId(data.user_id)});
         if(user.role == ROLE.MEMBER){
-            return {message: MESSAGE.unauthorized_user}
+            return {message: MESSAGE.unauthorized_user}             //Checking if the user is authorized
         }
-        const users = await Users.find({role: ROLE.MEMBER}, {password:0})
+        const users = await Users.find({role: ROLE.MEMBER}, {password:0})   //Fetch users
         return users;
     }
     catch(err){
@@ -106,13 +112,14 @@ exports.getAllUser = async (data) => {
     }
 }
 
+//Update user function
 exports.updateUser = async (data) => {
     try{
         const user = await Users.findOne({_id: new mongoose.Types.ObjectId(data.user_id)});
         if(user.role == ROLE.MEMBER){
-            return {message: MESSAGE.unauthorized_user}
+            return {message: MESSAGE.unauthorized_user}             //Checking if the user is authorized
         }
-        await Users.updateOne({_id: new mongoose.Types.ObjectId(data.member_id)}, {$set: {username: data.username}})
+        await Users.updateOne({_id: new mongoose.Types.ObjectId(data.member_id)}, {$set: {username: data.username}})  //Updating user
         return {message: MESSAGE.user_updated_successfully};
     }
     catch(err){
@@ -120,14 +127,15 @@ exports.updateUser = async (data) => {
     }
 }
 
+//Adding user function
 exports.addUser = async (data) => {
     try{
         const user = await Users.findOne({_id: new mongoose.Types.ObjectId(data.user_id)});
-        if(user.role == ROLE.MEMBER){
-            return {message: MESSAGE.unauthorized_user}
+        if(user.role == ROLE.MEMBER){                               //Checking if the user is authorized
+            return {message: MESSAGE.unauthorized_user} 
         }
-        let isUserPresent = await Users.findOne({username: data.username}).countDocuments();
-        if(!isUserPresent){
+        let isUserPresent = await Users.findOne({username: data.username}).countDocuments();    //Checking if username is present ot not
+        if(!isUserPresent){                                         //If not create the user
             const user = new Users({
                 username: data.username,
                 role: ROLE.MEMBER,
@@ -139,14 +147,13 @@ exports.addUser = async (data) => {
                 message: MESSAGE.user_registered_successfully
             };
         }
-        else{
+        else{                                                       //Else user already exists with given username
             return {
                 message: MESSAGE.username_already_exist
             }
         }
     }
     catch(err){
-        console.log(err)
         throw err;
     }
 };

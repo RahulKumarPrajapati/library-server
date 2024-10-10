@@ -10,7 +10,7 @@ const BookController = require('./controllers/book.controller');
 const port = process.env.PORT;
 
 app.use(cors({
-    origin: '*',
+    origin: process.env.CLIENT_URL,
     credentials: true
 }));
 
@@ -22,7 +22,7 @@ app.use(express.urlencoded({ extended: true }));
 
 
 app.get('/', (req, res) => {
-    res.send('Hello Express!')
+    res.send('Welcome to Library Management Server!')
 })
 
 app.use('/api', UserController);

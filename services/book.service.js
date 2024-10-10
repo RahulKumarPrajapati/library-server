@@ -4,6 +4,7 @@ const Books = require('../db/models/book.model');
 const Users = require('../db/models/user.model');
 const Histories = require('../db/models/history.model');
 
+//Add Book function
 exports.add = async (data) => {
     try{
         //Getting user
@@ -39,12 +40,13 @@ exports.add = async (data) => {
 exports.assign = async (bookData) => {
     try{
         const book = await Books.findOne({_id: new mongoose.Types.ObjectId(bookData.book_id)});
-        if(book){
-            if(book.available){
+        if(book){   //Checking if given book exists
+            if(book.available){     // Checking if book is available to be assigned
                 const member = await Users.findOne({_id: new mongoose.Types.ObjectId(bookData.member_id)});
-                if(member.role === ROLE.LIBRARIAN){
+                if(member.role === ROLE.LIBRARIAN){    //Checking if not assigning to librarian 
                     return {message: MESSAGE.cannot_assign_book_to_librarian}
                 }
+                //Successful book assignment
                 const result = await Books.updateOne({_id: new mongoose.Types.ObjectId(bookData.book_id)}, {$set: {available: false, user_id: new mongoose.Types.ObjectId(bookData.member_id)}})
                 if(result.modifiedCount >= 1){
                     await Histories.create({
@@ -53,16 +55,21 @@ exports.assign = async (bookData) => {
                     });
                     return {message: MESSAGE.book_assigned_successfully}
                 }
+                //Error assigning book
                 return {message: MESSAGE.error_assigning_book}
             }
+            //Book already assigned
             else{
                 return {message: MESSAGE.book_already_assigned}
             }
             
         }
+        //Book not exists
+        else{
+            return {message: MESSAGE.book_not_exists}
+        }
     }
     catch(err){
-        console.log(err)
         throw err;
     }
 }
@@ -76,7 +83,7 @@ exports.returnBook = async (bookData) => {
             //Checking if user is MEMBER and then assigning the book
             if (user.role === ROLE.MEMBER){
                 const book = await Books.findOne({_id: new mongoose.Types.ObjectId(bookData.book_id)});
-                if(book){
+                if(book){   //Checking if given book exists
                     if(!book.available && book.user_id == bookData.member_id){
                         const result = await Books.updateOne({_id: new mongoose.Types.ObjectId(bookData.book_id)}, {$set: {available: true}, $unset: {user_id: 1}})
                         if(result.modifiedCount >= 1){
@@ -87,13 +94,16 @@ exports.returnBook = async (bookData) => {
                             }, {return_date: new Date()});
                             return {message: MESSAGE.book_returned_successfully}
                         }
+                        //Error returning book
                         return {message: MESSAGE.error_returning_book}
                     }
+                    //Unauthorized access
                     else{
                         return {message: MESSAGE.unauthorized_user}
                     }
                     
                 }
+                //Given book doesn't exist
                 else{
                     return {message: MESSAGE.book_not_exists}
                 }
@@ -110,20 +120,17 @@ exports.returnBook = async (bookData) => {
         }
     }
     catch(err){
-        console.log(err)
         throw err;
     }
 }
 
+//Get Book list
 exports.getBooks = async (data) => {
     try{
-        console.log(data)
         let query = {removed: false};
-        console.log('Data',data)
         if(data.availableOnly == 'true'){
             query = {...query, available: true}
         }
-        console.log(query)
         const books = await Books.find(query);
         return books;
     }
@@ -132,6 +139,7 @@ exports.getBooks = async (data) => {
     }
 }
 
+//Get Borrowed book list
 exports.getBorrowedBooks = async (data) => {
     try{
         const borrowedBooks = await Books.find({user_id: new mongoose.Types.ObjectId(data.user_id)});
@@ -141,6 +149,8 @@ exports.getBorrowedBooks = async (data) => {
         throw err;
     }
 }
+
+//Get Borrowed books history list
 
 exports.borrowedBooksHitory = async (data) => {
     try{
@@ -179,11 +189,11 @@ exports.borrowedBooksHitory = async (data) => {
                 }
             },
             {
-                $project: {                 // Include history _id
-                    user_id: 1,              // Include user_id from Histories
-                    book_id: 1,              // Include book_id from Histories
-                    issue_date: 1,          // Include borrow_date
-                    return_date: 1,          // Include return_date
+                $project: {
+                    user_id: 1,
+                    book_id: 1,
+                    issue_date: 1,
+                    return_date: 1,
                     book_name: { $arrayElemAt: ["$book.name", 0] },
                     username: { $arrayElemAt: ["$user.username", 0] }
                 }
@@ -192,33 +202,34 @@ exports.borrowedBooksHitory = async (data) => {
         return borrowedBooks;
     }
     catch(err){
-        console.log(err)
         throw err;
     }
 }
 
+//Delete Book function
 exports.deleteBook = async(data) => {
     try{
         const user = await Users.findOne({_id: new mongoose.Types.ObjectId(data.user_id)});
         if(user.role == ROLE.MEMBER){
-            return {message: MESSAGE.unauthorized_user}
+            return {message: MESSAGE.unauthorized_user}         //Unauthorized access
         }
         await Books.updateOne({_id: new mongoose.Types.ObjectId(data.book_id)}, {$set: {removed: true}})
-        return {message: MESSAGE.book_deleted_successfully};
+        return {message: MESSAGE.book_deleted_successfully};    //Successful book deletion
     }
     catch(err){
         throw err;
     }
 }
 
+//Update book list
 exports.updateBook = async (data) => {
     try{
         const user = await Users.findOne({_id: new mongoose.Types.ObjectId(data.user_id)});
         if(user.role == ROLE.MEMBER){
-            return {message: MESSAGE.unauthorized_user}
+            return {message: MESSAGE.unauthorized_user}         //Unauthorized access
         }
         await Books.updateOne({_id: new mongoose.Types.ObjectId(data.book_id)}, {$set: {name: data.name}})
-        return {message: MESSAGE.book_updated_successfully};
+        return {message: MESSAGE.book_updated_successfully};    //Successful book updation
     }
     catch(err){
         throw err;

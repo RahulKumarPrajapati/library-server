@@ -34,7 +34,8 @@ const MESSAGE = {
     error_updating_user: 'error_updating_user',
     book_deleted_successfully: 'book_deleted_successfully',
     book_updated_successfully: 'book_updated_successfully',
-    error_updating_book: 'error_updating_book'
+    error_updating_book: 'error_updating_book',
+    not_a_valid_role: 'not_a_valid_role'
 }
 
 const ROLE = {

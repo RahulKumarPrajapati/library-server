@@ -1,0 +1,24 @@
+Users Schema(Stores user data)
+
+_id: ObjectId - Auto created by mongo for each data entry and is unique in that collection
+username: String(Required)
+role: Boolean(Required) - Can be only 1 or 2. 1 for LIBRARIAN ans 2 for MEMBER.
+password- String(Required) - Encrypted.
+deleted- Boolean - Tells if user is deleted or not.
+
+Books Schema(Stores the detail of a book and if it's assigned the to whoom it's assigned)
+
+_id: ObjectId - Auto created by mongo for each data entry and is unique in that collection
+name: String(Required) - Book name.
+available: Boolean(Default true) - Tell if book is available or not.If the value is false then it is borrowed.
+user_id: String(Foreign key references _id from Users collection) - Tells to which member book is assigned.
+removed: Boolean(Default false) - Tells if book is deleted or not
+
+
+Histories Schema(Stores the histories of book assignment and return)
+
+_id: ObjectId - Auto created by mongo for each data entry and is unique in that collection
+user_id: String(Foreign key references _id from Users collection) - Tells to which member book is assigned.
+book_id: String(Foreign key references _id from Books collection) - Tells to which book is assigned.
+issue_date: Date(Default now) - Issuing date of book.
+return_date: Date - Returning date of book.

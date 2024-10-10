@@ -1,0 +1,130 @@
+User apis
+
+
+1. /api/users/register
+    METHOD- POST
+    BODY - {
+        username: String,
+        role: Number
+        password: String
+    }
+    OUTPUT - user_registered_successfully
+    ERRORS - not_a_valid_role, username_already_exist, error_registering_user
+        
+
+2. /api/users/login
+    METHOD- POST
+    BODY - {
+        username: String,
+        password: String
+    }
+    OUTPUT - login_successful
+    ERRORS - user_not_found, invalid_password, error_logging_user
+
+3. /api/users/delete
+    METHOD- POST
+    BODY - {
+        user_id: String
+    }
+    OUTPUT - user_deleted_successfully
+    ERRORS - user_has_borrowed_books, error_deleting_user
+
+4. /api/users/getAllUsers
+    METHOD- GET
+    Query - {
+        user_id: String
+    }
+    OUTPUT - usesList
+    ERRORS - unauthorized_user, error_getting_users
+
+5. /api/users/update
+    METHOD- POST
+    BODY - {
+        user_id: String,
+        member_id: String
+        username: String
+    }
+    OUTPUT - user_updated_successfully
+    ERRORS - unauthorized_user, error_updating_user
+
+6. /api/users/add
+    METHOD- POST
+    BODY - {
+        user_id: String,
+        username: String
+        password: String
+    }
+    OUTPUT - user_registered_successfully
+    ERRORS - unauthorized_user, username_already_exist, error_registering_user
+
+Book apis
+
+1. /api/books/add
+    METHOD- POST
+    BODY - {
+        user_id: String,
+        bookName: String
+    }
+    OUTPUT - book_added_successfully
+    ERRORS - unauthorized_user, error_adding_book
+
+2. /api/books/assign
+    METHOD- POST
+    BODY - {
+        book_id: String,
+        member_id: String
+    }
+    OUTPUT - book_assigned_successfully
+    ERRORS - cannot_assign_book_to_librarian, error_assigning_book, book_already_assigned
+
+3. /api/books/returnBook
+    METHOD- POST
+    BODY - {
+        book_id: String,
+        member_id: String
+    }
+    OUTPUT - book_returned_successfully
+    ERRORS - book_not_exists, error_returning_book, unauthorized_user
+
+4. /api/books/getBooks
+    METHOD- GET
+    QUERY - {
+        availableOnly: Boolean
+    }
+    OUTPUT - bookList
+    ERRORS - error_getting_books
+
+5. /api/books/getBorrowedBooks
+    METHOD- GET
+    QUERY - {
+        user_id: String
+    }
+    OUTPUT - borrowedBooksList
+    ERRORS - error_getting_books
+
+6. /api/books/getBorrowedBooksHistory
+    METHOD- GET
+    QUERY - {
+        user_id: String
+    }
+    OUTPUT - borrowedBooksHistoryList
+    ERRORS - error_getting_books
+
+7. /api/books/delete
+    METHOD- POST
+    BODY - {
+        user_id: String,
+        book_id: String
+    }
+    OUTPUT - book_deleted_successfully
+    ERRORS - unauthorized_user, error_getting_books
+
+8. /api/books/update
+    METHOD- POST
+    BODY - {
+        user_id: String,
+        book_id: String,
+        name: String
+    }
+    OUTPUT - book_updated_successfully
+    ERRORS - unauthorized_user, error_updating_book

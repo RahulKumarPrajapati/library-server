@@ -1,0 +1,21 @@
+Hosting
+
+Plateform --> Render
+
+Steps-
+
+1. Create your profile on Render
+2. To create a new service click on New and choose Web service.
+3. Select you repository from Git and then click Connect.
+4. Set your configuration
+    1. Set service name. 
+    2. Choose language as Node.
+    3. In Build command write npm install
+    4. In Start command write node app.js
+    5. Select A Free instance type
+    6. Set environmnets variables. Set SECRET_API_KEY, PORT and MONGO_URI.
+        1. SECRET_API_KEY - Any secret key for JWT use
+        2. PORT - SET to 4200
+        3. MONGO_URI - Give your mongo uri here.
+5. Deploy web service.
+6. After deployment you will get a link by which you can use server apis. 
