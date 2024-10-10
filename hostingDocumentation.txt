@@ -13,9 +13,10 @@ Steps-
     3. In Build command write npm install
     4. In Start command write node app.js
     5. Select A Free instance type
-    6. Set environmnets variables. Set SECRET_API_KEY, PORT and MONGO_URI.
+    6. Set environmnets variables. Set SECRET_API_KEY, PORT, CLIENT_URL and MONGO_URI.
         1. SECRET_API_KEY - Any secret key for JWT use
         2. PORT - SET to 4200
-        3. MONGO_URI - Give your mongo uri here.
+        3. CLIENT_URL - Your client side url
+        4. MONGO_URI - Give your mongo uri here.
 5. Deploy web service.
 6. After deployment you will get a link by which you can use server apis. 
